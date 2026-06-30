@@ -21,6 +21,19 @@ const CONFIG = {
   database: process.env.DB_NAME || 'hotel_portal'
 };
 
+// Ports to try, in order. We start with the configured port (3306 by default)
+// and fall back to 3307 — the port XAMPP users commonly move MySQL to when
+// something else already occupies 3306. Override the whole list with
+// DB_PORT_FALLBACKS="3306,3307,3308" if needed.
+function candidatePorts() {
+  const fallbacks = (process.env.DB_PORT_FALLBACKS || '3307')
+    .split(',')
+    .map((p) => Number(p.trim()))
+    .filter((p) => Number.isInteger(p) && p > 0);
+  const ordered = [CONFIG.port, ...fallbacks];
+  return [...new Set(ordered)]; // de-dupe, preserve order
+}
+
 function toIso(value) {
   if (!value) return null;
   // mysql2 returns JS Date objects for DATETIME columns.
@@ -29,15 +42,39 @@ function toIso(value) {
 
 module.exports = function createMysqlStore() {
   let pool;
+  // The port we actually connected on (resolved at startup across candidates).
+  let activePort = CONFIG.port;
+
+  // Tries each candidate port until one accepts a connection. Returns an open
+  // "bootstrap" connection (no database selected) on the working port, or
+  // throws the last error if every candidate fails.
+  async function connectBootstrap() {
+    const ports = candidatePorts();
+    let lastErr;
+    for (const port of ports) {
+      try {
+        const conn = await mysql.createConnection({
+          host: CONFIG.host,
+          port,
+          user: CONFIG.user,
+          password: CONFIG.password,
+          connectTimeout: 4000
+        });
+        activePort = port;
+        if (port !== CONFIG.port) {
+          console.log(`MySQL: port ${CONFIG.port} unavailable, connected on ${port} instead.`);
+        }
+        return conn;
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    throw lastErr;
+  }
 
   async function ensureDatabase() {
     // Connect without selecting a database so we can create it if missing.
-    const bootstrap = await mysql.createConnection({
-      host: CONFIG.host,
-      port: CONFIG.port,
-      user: CONFIG.user,
-      password: CONFIG.password
-    });
+    const bootstrap = await connectBootstrap();
     await bootstrap.query(
       `CREATE DATABASE IF NOT EXISTS \`${CONFIG.database}\`
        CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
@@ -118,7 +155,7 @@ module.exports = function createMysqlStore() {
       await ensureDatabase();
       pool = mysql.createPool({
         host: CONFIG.host,
-        port: CONFIG.port,
+        port: activePort, // resolved across candidate ports in ensureDatabase()
         user: CONFIG.user,
         password: CONFIG.password,
         database: CONFIG.database,

@@ -44,6 +44,13 @@ and are redirected to the hotel's official website. Staff get a live
 > You can inspect the data anytime in **phpMyAdmin** (the "Admin" button next to
 > MySQL in XAMPP) under the `hotel_portal` database.
 
+**Port 3306 already in use?** This is common when another MySQL service is
+installed. In XAMPP, click **Config → my.ini** next to MySQL, change `port=3306`
+to `port=3307` (there's usually one under `[mysqld]` and one under `[client]`),
+save, and start MySQL. The portal **automatically tries port 3307** if 3306
+isn't available, so no other change is needed. (You can customise the fallback
+list with `DB_PORT_FALLBACKS`.)
+
 **No MySQL handy?** Edit `start.bat` and uncomment `set DB_DRIVER=json` to run
 with a zero-setup JSON file instead.
 
@@ -85,6 +92,7 @@ All configuration is via environment variables (defaults shown):
 | `DB_DRIVER` | `mysql` | `mysql` (XAMPP-ready) or `json` (no database). |
 | `DB_HOST` | `127.0.0.1` | MySQL host. |
 | `DB_PORT` | `3306` | MySQL port. |
+| `DB_PORT_FALLBACKS` | `3307` | Ports tried automatically if `DB_PORT` is busy. |
 | `DB_USER` | `root` | MySQL user (XAMPP default). |
 | `DB_PASSWORD` | _(empty)_ | MySQL password (XAMPP default is empty). |
 | `DB_NAME` | `hotel_portal` | Database name (created automatically). |

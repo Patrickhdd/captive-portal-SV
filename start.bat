@@ -34,6 +34,8 @@ REM --- Database -------------------------------------------------------------
 REM This portal uses MySQL by default. Start MySQL in the XAMPP Control Panel
 REM before launching. Defaults match a fresh XAMPP install (localhost, user
 REM "root", empty password, database "hotel_portal" - created automatically).
+REM If port 3306 is busy and you moved XAMPP MySQL to 3307, no change is
+REM needed: the portal tries 3307 automatically.
 REM Override only if your MySQL differs:
 REM set DB_HOST=127.0.0.1
 REM set DB_PORT=3306

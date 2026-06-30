@@ -281,6 +281,8 @@ async function start() {
       console.error(
         'Make sure MySQL is running (e.g. start MySQL in the XAMPP Control Panel) and that\n' +
           'DB_HOST / DB_PORT / DB_USER / DB_PASSWORD / DB_NAME are correct.\n' +
+          'The portal already tried ports 3306 and 3307 automatically.\n' +
+          'If your MySQL uses a different port, set DB_PORT to it.\n' +
           'Tip: to run without a database, set DB_DRIVER=json\n'
       );
     }
