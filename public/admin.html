@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketing Dashboard — Hotel WiFi</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">📊</div>
+      <div>
+        <h1>Marketing Dashboard</h1>
+        <small>Live view of guest activity on the WiFi portal</small>
+      </div>
+    </div>
+
+    <!-- Login gate -->
+    <section id="gate" class="card center-narrow">
+      <h2>Staff access</h2>
+      <p class="subtitle">Enter the dashboard password to view analytics.</p>
+      <label for="admin-pass">Password</label>
+      <input id="admin-pass" type="password" placeholder="Dashboard password" />
+      <button id="gate-btn" class="btn">View dashboard</button>
+      <div id="gate-msg" class="msg"></div>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard" class="hidden">
+      <div class="welcome-bar">
+        <span>Auto-refreshing every 10 seconds</span>
+        <a id="refresh">Refresh now</a>
+      </div>
+
+      <div id="stats" class="stat-grid"></div>
+
+      <div class="panel">
+        <h3>Plan popularity</h3>
+        <div id="plan-bars"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Payment methods</h3>
+        <div id="payment-bars"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Sign-ups (last 14 days)</h3>
+        <div id="signup-bars"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Recent activity</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Event</th>
+              <th>Guest</th>
+              <th>Plan</th>
+              <th>Payment</th>
+            </tr>
+          </thead>
+          <tbody id="activity-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="footer-note">
+      <a href="/" style="color: var(--muted);">← Back to the WiFi portal</a>
+    </p>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

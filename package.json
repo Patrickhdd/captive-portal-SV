@@ -1,0 +1,20 @@
+{
+  "name": "hotel-captive-portal",
+  "version": "1.0.0",
+  "description": "Captive portal for a hotel: login/signup, WiFi plan selection (free + fiber optic tiers), payment via Wish Money Lebanon or cash at reception, and a marketing analytics dashboard.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "captive-portal",
+    "hotel",
+    "wifi",
+    "express"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

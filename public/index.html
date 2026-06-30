@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel WiFi — Connect</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">🏨</div>
+      <div>
+        <h1>Grand Hotel WiFi</h1>
+        <small>Welcome — connect to the internet in a few steps</small>
+      </div>
+    </div>
+
+    <!-- STEP 1: Login -->
+    <section id="login-card" class="card center-narrow">
+      <h2>Sign in</h2>
+      <p class="subtitle">Enter the username and password for your stay.</p>
+
+      <label for="login-username">Username</label>
+      <input id="login-username" type="text" autocomplete="username" placeholder="e.g. room204" />
+
+      <label for="login-password">Password</label>
+      <input id="login-password" type="password" autocomplete="current-password" placeholder="Your password" />
+
+      <button id="login-btn" class="btn">Sign in &amp; continue</button>
+
+      <div id="login-msg" class="msg"></div>
+
+      <p class="switch-line">
+        No account yet? <a id="to-signup">Sign up here</a>
+      </p>
+    </section>
+
+    <!-- STEP 1b: Sign up -->
+    <section id="signup-card" class="card center-narrow hidden">
+      <h2>Create your account</h2>
+      <p class="subtitle">Guests without a username can register here.</p>
+
+      <label for="signup-fullname">Full name</label>
+      <input id="signup-fullname" type="text" placeholder="John Doe" />
+
+      <label for="signup-room">Room number</label>
+      <input id="signup-room" type="text" placeholder="e.g. 204" />
+
+      <label for="signup-username">Choose a username</label>
+      <input id="signup-username" type="text" autocomplete="username" placeholder="e.g. room204" />
+
+      <label for="signup-password">Choose a password</label>
+      <input id="signup-password" type="password" autocomplete="new-password" placeholder="At least 4 characters" />
+
+      <button id="signup-btn" class="btn">Create account &amp; continue</button>
+
+      <div id="signup-msg" class="msg"></div>
+
+      <p class="switch-line">
+        Already have a username? <a id="to-login">Sign in</a>
+      </p>
+    </section>
+
+    <!-- STEP 2: Plan + payment -->
+    <section id="plan-card" class="card hidden">
+      <div class="welcome-bar">
+        <span>Signed in as <strong id="current-user">guest</strong></span>
+        <a id="logout">Switch user</a>
+      </div>
+
+      <h2>Choose your internet plan</h2>
+      <p class="subtitle">Pick free WiFi or upgrade to a dedicated fiber optic line.</p>
+
+      <div id="plans" class="plans"></div>
+
+      <div id="payment-step" class="step hidden">
+        <h2>Payment method</h2>
+        <p class="subtitle">How would you like to pay for your fiber plan?</p>
+        <div id="pay-methods" class="pay-methods"></div>
+      </div>
+
+      <button id="confirm-btn" class="btn" disabled>Confirm &amp; connect</button>
+      <div id="plan-msg" class="msg"></div>
+    </section>
+
+    <!-- STEP 3: Done -->
+    <section id="done-card" class="card center-narrow hidden">
+      <h2>🎉 You're all set!</h2>
+      <p class="subtitle" id="done-summary"></p>
+      <p class="subtitle">You'll be redirected to our website in a moment…</p>
+      <button id="go-now" class="btn">Continue to our website now</button>
+    </section>
+
+    <p class="footer-note">
+      Staff only:
+      <a href="/admin" style="color: var(--muted);">marketing dashboard</a>
+    </p>
+  </div>
+
+  <script src="/js/portal.js"></script>
+</body>
+</html>
