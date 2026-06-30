@@ -25,6 +25,15 @@ and are redirected to the hotel's official website. Staff get a live
 
 ## Quick start
 
+### Windows (easiest)
+
+Make sure [Node.js](https://nodejs.org/) (LTS) is installed, then just
+**double-click `start.bat`**. It installs dependencies the first time,
+starts the server, and opens the portal in your browser. Keep the window
+open while the portal runs; close it to stop.
+
+### Any platform (command line)
+
 ```bash
 npm install
 npm start
