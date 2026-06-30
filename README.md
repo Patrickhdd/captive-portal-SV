@@ -45,11 +45,17 @@ and are redirected to the hotel's official website. Staff get a live
 > MySQL in XAMPP) under the `hotel_portal` database.
 
 **Port 3306 already in use?** This is common when another MySQL service is
-installed. In XAMPP, click **Config → my.ini** next to MySQL, change `port=3306`
-to `port=3307` (there's usually one under `[mysqld]` and one under `[client]`),
-save, and start MySQL. The portal **automatically tries port 3307** if 3306
-isn't available, so no other change is needed. (You can customise the fallback
-list with `DB_PORT_FALLBACKS`.)
+installed. You have two easy paths, both needing no config changes:
+
+- *Use the MySQL that's already on 3306* — just run `start.bat` without starting
+  XAMPP's MySQL. The portal connects to it and creates its database/tables.
+- *Run XAMPP's MySQL on 3307* — in XAMPP click **Config → my.ini** next to MySQL,
+  change `port=3306` to `port=3307` (under `[mysqld]` and `[client]`), save, and
+  start it.
+
+The portal automatically tries **127.0.0.1 and localhost** on ports **3306 and
+3307** until one answers, so either path works out of the box. Customise with
+`DB_HOST_FALLBACKS` / `DB_PORT_FALLBACKS` if your setup differs.
 
 **No MySQL handy?** Edit `start.bat` and uncomment `set DB_DRIVER=json` to run
 with a zero-setup JSON file instead.
@@ -93,6 +99,7 @@ All configuration is via environment variables (defaults shown):
 | `DB_HOST` | `127.0.0.1` | MySQL host. |
 | `DB_PORT` | `3306` | MySQL port. |
 | `DB_PORT_FALLBACKS` | `3307` | Ports tried automatically if `DB_PORT` is busy. |
+| `DB_HOST_FALLBACKS` | `127.0.0.1,localhost` | Hosts tried automatically if `DB_HOST` fails. |
 | `DB_USER` | `root` | MySQL user (XAMPP default). |
 | `DB_PASSWORD` | _(empty)_ | MySQL password (XAMPP default is empty). |
 | `DB_NAME` | `hotel_portal` | Database name (created automatically). |

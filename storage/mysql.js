@@ -34,6 +34,18 @@ function candidatePorts() {
   return [...new Set(ordered)]; // de-dupe, preserve order
 }
 
+// Hosts to try, in order. Some MySQL installs listen on "localhost" (a unix
+// socket / named pipe) but not on the "127.0.0.1" TCP address, or vice versa,
+// so we fall back between the two. Override with DB_HOST_FALLBACKS if needed.
+function candidateHosts() {
+  const fallbacks = (process.env.DB_HOST_FALLBACKS || '127.0.0.1,localhost')
+    .split(',')
+    .map((h) => h.trim())
+    .filter(Boolean);
+  const ordered = [CONFIG.host, ...fallbacks];
+  return [...new Set(ordered)]; // de-dupe, preserve order
+}
+
 function toIso(value) {
   if (!value) return null;
   // mysql2 returns JS Date objects for DATETIME columns.
@@ -42,31 +54,39 @@ function toIso(value) {
 
 module.exports = function createMysqlStore() {
   let pool;
-  // The port we actually connected on (resolved at startup across candidates).
+  // The host/port we actually connected on (resolved at startup across the
+  // candidate combinations).
+  let activeHost = CONFIG.host;
   let activePort = CONFIG.port;
 
-  // Tries each candidate port until one accepts a connection. Returns an open
-  // "bootstrap" connection (no database selected) on the working port, or
-  // throws the last error if every candidate fails.
+  // Tries each host/port combination until one accepts a connection. Returns an
+  // open "bootstrap" connection (no database selected) on the working address,
+  // or throws the last error if every combination fails.
   async function connectBootstrap() {
+    const hosts = candidateHosts();
     const ports = candidatePorts();
     let lastErr;
-    for (const port of ports) {
-      try {
-        const conn = await mysql.createConnection({
-          host: CONFIG.host,
-          port,
-          user: CONFIG.user,
-          password: CONFIG.password,
-          connectTimeout: 4000
-        });
-        activePort = port;
-        if (port !== CONFIG.port) {
-          console.log(`MySQL: port ${CONFIG.port} unavailable, connected on ${port} instead.`);
+    for (const host of hosts) {
+      for (const port of ports) {
+        try {
+          const conn = await mysql.createConnection({
+            host,
+            port,
+            user: CONFIG.user,
+            password: CONFIG.password,
+            connectTimeout: 4000
+          });
+          activeHost = host;
+          activePort = port;
+          if (host !== CONFIG.host || port !== CONFIG.port) {
+            console.log(
+              `MySQL: ${CONFIG.host}:${CONFIG.port} unavailable, connected on ${host}:${port} instead.`
+            );
+          }
+          return conn;
+        } catch (err) {
+          lastErr = err;
         }
-        return conn;
-      } catch (err) {
-        lastErr = err;
       }
     }
     throw lastErr;
@@ -154,8 +174,8 @@ module.exports = function createMysqlStore() {
     async init() {
       await ensureDatabase();
       pool = mysql.createPool({
-        host: CONFIG.host,
-        port: activePort, // resolved across candidate ports in ensureDatabase()
+        host: activeHost, // resolved across candidate hosts/ports in ensureDatabase()
+        port: activePort,
         user: CONFIG.user,
         password: CONFIG.password,
         database: CONFIG.database,
