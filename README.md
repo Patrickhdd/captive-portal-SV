@@ -44,6 +44,15 @@ Then open:
 - Guest portal: <http://localhost:3000>
 - Marketing dashboard: <http://localhost:3000/admin>
 
+### Sign-in credentials
+
+- **Guest portal:** guests create their own accounts via **Sign up**. For
+  convenience, a demo account is auto-created on first run:
+  **username `guest` / password `guest123`** (change with `DEMO_USERNAME` /
+  `DEMO_PASSWORD`, or disable with `SEED_DEMO_USER=false`).
+- **Marketing dashboard:** password **`admin123`** (change with
+  `ADMIN_PASSWORD`).
+
 ## Configuration
 
 All configuration is via environment variables (defaults shown):

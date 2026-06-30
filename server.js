@@ -280,6 +280,34 @@ app.get('/api/admin/stats', checkAdmin, (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------------------
+// Seed a demo guest account on first run so the portal can be tried straight
+// away. Disable by setting SEED_DEMO_USER=false. Real guests still sign up
+// normally; this only runs when there are no users yet.
+// ---------------------------------------------------------------------------
+function seedDemoUser() {
+  if (process.env.SEED_DEMO_USER === 'false') return;
+  const store = db.read();
+  if (store.users.length > 0) return;
+
+  const username = process.env.DEMO_USERNAME || 'guest';
+  const password = process.env.DEMO_PASSWORD || 'guest123';
+  const { salt, hash } = hashPassword(password);
+  store.users.push({
+    id: db.nextId(store.users),
+    username,
+    passwordHash: hash,
+    salt,
+    fullName: 'Demo Guest',
+    roomNumber: '101',
+    createdAt: new Date().toISOString()
+  });
+  db.write(store);
+  console.log(`Seeded demo guest account -> username: ${username}  password: ${password}`);
+}
+
+seedDemoUser();
+
 app.listen(PORT, () => {
   console.log(`Hotel captive portal running on http://localhost:${PORT}`);
   console.log(`Marketing dashboard at   http://localhost:${PORT}/admin`);
