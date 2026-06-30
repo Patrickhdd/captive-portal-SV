@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marketing Dashboard — Hotel WiFi</title>
+  <title>Admin &amp; Marketing — Hotel WiFi</title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
@@ -11,59 +11,141 @@
     <div class="brand">
       <div class="logo">📊</div>
       <div>
-        <h1>Marketing Dashboard</h1>
-        <small>Live view of guest activity on the WiFi portal</small>
+        <h1>Admin &amp; Marketing</h1>
+        <small>Manage guests, plans, and view live activity</small>
       </div>
     </div>
 
     <!-- Login gate -->
     <section id="gate" class="card center-narrow">
       <h2>Staff access</h2>
-      <p class="subtitle">Enter the dashboard password to view analytics.</p>
+      <p class="subtitle">Enter the dashboard password to continue.</p>
       <label for="admin-pass">Password</label>
       <input id="admin-pass" type="password" placeholder="Dashboard password" />
-      <button id="gate-btn" class="btn">View dashboard</button>
+      <button id="gate-btn" class="btn">Sign in</button>
       <div id="gate-msg" class="msg"></div>
     </section>
 
-    <!-- Dashboard -->
-    <section id="dashboard" class="hidden">
-      <div class="welcome-bar">
-        <span>Auto-refreshing every 10 seconds</span>
-        <a id="refresh">Refresh now</a>
+    <!-- Admin app -->
+    <section id="app" class="hidden">
+      <div class="tabs">
+        <button class="tab active" data-tab="overview">Overview</button>
+        <button class="tab" data-tab="guests">Guests</button>
+        <button class="tab" data-tab="plans">Plans &amp; Pricing</button>
+        <button class="tab" data-tab="logout-tab" id="logout-btn">Sign out</button>
       </div>
 
-      <div id="stats" class="stat-grid"></div>
-
-      <div class="panel">
-        <h3>Plan popularity</h3>
-        <div id="plan-bars"></div>
+      <!-- OVERVIEW -->
+      <div id="tab-overview" class="tab-panel">
+        <div class="welcome-bar">
+          <span>Auto-refreshing every 10 seconds</span>
+          <a id="refresh">Refresh now</a>
+        </div>
+        <div id="stats" class="stat-grid"></div>
+        <div class="panel"><h3>Plan popularity</h3><div id="plan-bars"></div></div>
+        <div class="panel"><h3>Payment methods</h3><div id="payment-bars"></div></div>
+        <div class="panel"><h3>Sign-ups (last 14 days)</h3><div id="signup-bars"></div></div>
+        <div class="panel">
+          <h3>Recent activity</h3>
+          <table>
+            <thead>
+              <tr><th>Time</th><th>Event</th><th>Guest</th><th>Plan</th><th>Payment</th></tr>
+            </thead>
+            <tbody id="activity-body"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="panel">
-        <h3>Payment methods</h3>
-        <div id="payment-bars"></div>
+      <!-- GUESTS -->
+      <div id="tab-guests" class="tab-panel hidden">
+        <div class="panel">
+          <h3>Add a guest account</h3>
+          <div class="form-grid">
+            <div>
+              <label for="g-username">Username</label>
+              <input id="g-username" type="text" placeholder="e.g. room305" />
+            </div>
+            <div>
+              <label for="g-password">Password</label>
+              <input id="g-password" type="text" placeholder="At least 4 characters" />
+            </div>
+            <div>
+              <label for="g-fullname">Full name</label>
+              <input id="g-fullname" type="text" placeholder="Jane Doe" />
+            </div>
+            <div>
+              <label for="g-room">Room number</label>
+              <input id="g-room" type="text" placeholder="305" />
+            </div>
+          </div>
+          <button id="add-guest-btn" class="btn" style="max-width:220px">Add guest</button>
+          <div id="guest-msg" class="msg"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Registered guests (<span id="guest-count">0</span>)</h3>
+          <table>
+            <thead>
+              <tr><th>Username</th><th>Full name</th><th>Room</th><th>Registered</th><th></th></tr>
+            </thead>
+            <tbody id="guests-body"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="panel">
-        <h3>Sign-ups (last 14 days)</h3>
-        <div id="signup-bars"></div>
-      </div>
+      <!-- PLANS -->
+      <div id="tab-plans" class="tab-panel hidden">
+        <div class="panel">
+          <h3>Add / edit a plan</h3>
+          <p class="subtitle">Use a new ID to add a plan, or an existing ID to update it.</p>
+          <div class="form-grid">
+            <div>
+              <label for="p-id">Plan ID (no spaces)</label>
+              <input id="p-id" type="text" placeholder="e.g. fiber-100" />
+            </div>
+            <div>
+              <label for="p-name">Display name</label>
+              <input id="p-name" type="text" placeholder="Fiber Optic 100 Mbps" />
+            </div>
+            <div>
+              <label for="p-type">Type</label>
+              <select id="p-type">
+                <option value="fiber">Fiber (paid)</option>
+                <option value="free">Free</option>
+              </select>
+            </div>
+            <div>
+              <label for="p-speed">Speed label</label>
+              <input id="p-speed" type="text" placeholder="100 Mbps" />
+            </div>
+            <div>
+              <label for="p-amount">Price (USD)</label>
+              <input id="p-amount" type="number" min="0" step="0.5" placeholder="15" />
+            </div>
+            <div>
+              <label for="p-order">Sort order</label>
+              <input id="p-order" type="number" min="0" step="1" placeholder="5" />
+            </div>
+          </div>
+          <label for="p-desc">Description</label>
+          <input id="p-desc" type="text" placeholder="Short description shown to guests" />
+          <label style="display:flex;align-items:center;gap:8px;margin-top:14px">
+            <input id="p-active" type="checkbox" checked style="width:auto" /> Active (shown to guests)
+          </label>
+          <button id="save-plan-btn" class="btn" style="max-width:220px">Save plan</button>
+          <button id="clear-plan-btn" class="btn secondary" style="max-width:220px">Clear form</button>
+          <div id="plan-msg" class="msg"></div>
+        </div>
 
-      <div class="panel">
-        <h3>Recent activity</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Event</th>
-              <th>Guest</th>
-              <th>Plan</th>
-              <th>Payment</th>
-            </tr>
-          </thead>
-          <tbody id="activity-body"></tbody>
-        </table>
+        <div class="panel">
+          <h3>Current plans</h3>
+          <table>
+            <thead>
+              <tr><th>Order</th><th>Name</th><th>Type</th><th>Speed</th><th>Price</th><th>Active</th><th></th></tr>
+            </thead>
+            <tbody id="plans-body"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 

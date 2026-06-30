@@ -26,9 +26,23 @@ if errorlevel 1 (
   exit /b 1
 )
 
-REM --- Optional settings: edit these two lines for your hotel ---------------
+REM --- Optional settings: edit these lines for your hotel -------------------
 REM set OFFICIAL_WEBSITE_URL=https://www.your-hotel.com
 REM set ADMIN_PASSWORD=change-me
+
+REM --- Database -------------------------------------------------------------
+REM This portal uses MySQL by default. Start MySQL in the XAMPP Control Panel
+REM before launching. Defaults match a fresh XAMPP install (localhost, user
+REM "root", empty password, database "hotel_portal" - created automatically).
+REM Override only if your MySQL differs:
+REM set DB_HOST=127.0.0.1
+REM set DB_PORT=3306
+REM set DB_USER=root
+REM set DB_PASSWORD=
+REM set DB_NAME=hotel_portal
+REM
+REM No MySQL handy? Run without a database by uncommenting the next line:
+REM set DB_DRIVER=json
 
 REM --- Install dependencies the first time ----------------------------------
 if not exist "node_modules" (

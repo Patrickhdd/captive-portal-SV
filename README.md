@@ -20,23 +20,43 @@ and are redirected to the hotel's official website. Staff get a live
   Lebanon** or **Cash at Reception**. Free WiFi needs no payment.
 - **Redirect** — after a plan is confirmed the guest is sent to the hotel's
   official website.
-- **Marketing dashboard** (`/admin`) — totals, plan popularity, payment method
-  breakdown, sign-up trend, estimated fiber revenue, and a live activity feed.
+- **Admin & marketing panel** (`/admin`) — password protected, with three tabs:
+  - **Overview** — totals, plan popularity, payment breakdown, sign-up trend,
+    estimated fiber revenue, and a live activity feed.
+  - **Guests** — list, add, and delete guest accounts.
+  - **Plans & Pricing** — add, edit, activate/deactivate, and delete plans and
+    prices without touching code.
+- **Storage** — **MySQL / MariaDB** (works with XAMPP out of the box), or a
+  zero-setup JSON file (`DB_DRIVER=json`).
 
 ## Quick start
 
-### Windows (easiest)
+### Windows with XAMPP (recommended)
 
-Make sure [Node.js](https://nodejs.org/) (LTS) is installed, then just
-**double-click `start.bat`**. It installs dependencies the first time,
-starts the server, and opens the portal in your browser. Keep the window
-open while the portal runs; close it to stop.
+1. Install [Node.js](https://nodejs.org/) (LTS) and
+   [XAMPP](https://www.apachefriends.org/).
+2. Open the **XAMPP Control Panel** and click **Start** next to **MySQL**.
+3. **Double-click `start.bat`.** It installs dependencies the first time,
+   creates the `hotel_portal` database and tables automatically, starts the
+   server, and opens the portal in your browser. Keep the window open while the
+   portal runs; close it to stop.
+
+> You can inspect the data anytime in **phpMyAdmin** (the "Admin" button next to
+> MySQL in XAMPP) under the `hotel_portal` database.
+
+**No MySQL handy?** Edit `start.bat` and uncomment `set DB_DRIVER=json` to run
+with a zero-setup JSON file instead.
 
 ### Any platform (command line)
 
 ```bash
 npm install
+
+# With MySQL (default) — make sure MySQL is running first:
 npm start
+
+# Or without a database:
+DB_DRIVER=json npm start
 ```
 
 Then open:
@@ -61,42 +81,57 @@ All configuration is via environment variables (defaults shown):
 | --- | --- | --- |
 | `PORT` | `3000` | Port the server listens on. |
 | `OFFICIAL_WEBSITE_URL` | `https://www.your-hotel.com` | Where guests are redirected after choosing a plan. |
-| `ADMIN_PASSWORD` | `admin123` | Password to open the marketing dashboard. |
+| `ADMIN_PASSWORD` | `admin123` | Password to open the admin panel. |
+| `DB_DRIVER` | `mysql` | `mysql` (XAMPP-ready) or `json` (no database). |
+| `DB_HOST` | `127.0.0.1` | MySQL host. |
+| `DB_PORT` | `3306` | MySQL port. |
+| `DB_USER` | `root` | MySQL user (XAMPP default). |
+| `DB_PASSWORD` | _(empty)_ | MySQL password (XAMPP default is empty). |
+| `DB_NAME` | `hotel_portal` | Database name (created automatically). |
+| `SEED_DEMO_USER` | `true` | Seed the demo guest on first run. |
+| `DEMO_USERNAME` / `DEMO_PASSWORD` | `guest` / `guest123` | Demo guest credentials. |
 
-Example:
-
-```bash
-OFFICIAL_WEBSITE_URL="https://www.grandhotel.com" \
-ADMIN_PASSWORD="a-strong-secret" \
-PORT=8080 \
-npm start
-```
-
-To change plans, prices, or payment methods, edit the `PLANS` and
-`PAYMENT_METHODS` arrays at the top of `server.js`.
+See `.env.example` for the full list. Plans, prices, and payment-required
+flags are managed from the **Plans & Pricing** tab in `/admin` — no code
+edits needed.
 
 ## How it works
 
 - **Backend:** Node.js + Express (`server.js`). Passwords are hashed with
   PBKDF2 (Node's built-in `crypto`) — no plaintext storage.
-- **Storage:** a JSON file at `data/db.json` (created automatically) holding
-  `users` and `events`. No database to install.
+- **Storage:** a pluggable driver (`storage/`) — **MySQL/MariaDB** by default
+  (tables auto-created), or a JSON file (`DB_DRIVER=json`). Both expose the same
+  interface, so the rest of the app doesn't change.
 - **Frontend:** static HTML/CSS/JS in `public/`.
 - **Analytics:** every signup, login, failed login, and plan selection is
   recorded as an event, which powers the dashboard.
 
+### Database tables (MySQL)
+
+| Table | Holds |
+| --- | --- |
+| `users` | Guest accounts (hashed passwords). |
+| `events` | Activity log powering the marketing dashboard. |
+| `plans` | The editable plan catalogue. |
+
 ## Project structure
 
 ```
-server.js            Express server + API + plan catalogue
-db.js                JSON-file storage helper
+server.js            Express server + REST API
+storage/
+  index.js           Picks the driver from DB_DRIVER
+  mysql.js           MySQL/MariaDB driver (XAMPP-ready)
+  json.js            JSON-file driver (no database)
+  defaults.js        Default plans + payment methods
+  stats.js           Shared dashboard stat computation
 public/
   index.html         Guest portal (login → plan → payment → redirect)
-  admin.html         Marketing dashboard
+  admin.html         Admin panel (Overview / Guests / Plans)
   css/styles.css     Shared styling
   js/portal.js       Guest portal logic
-  js/admin.js        Dashboard logic
-data/db.json         Auto-created data store (git-ignored)
+  js/admin.js        Admin panel logic
+data/db.json         Auto-created store when DB_DRIVER=json (git-ignored)
+.env.example         All configuration options
 ```
 
 ## Notes
